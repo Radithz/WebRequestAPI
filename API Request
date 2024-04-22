@@ -1,0 +1,143 @@
+public void WebrequestAPI()
+{
+   System.Exception        ex;
+    str destinationUrl ,requestXml, APIresponse;
+    System.IO.Stream        requestStream, responseStream;
+    str                             url;
+   // str                             postData;
+    str                             returnValue;
+    System.Net.HttpWebRequest       request;
+    System.Net.HttpWebResponse      response;
+    System.Byte[]                   byteArray;
+    System.IO.Stream                dataStream;
+    System.IO.StreamReader          streamReader;
+    System.Net.ServicePoint         servicePoint;
+    System.Net.ServicePointManager  servicePointManager;
+    CLRObject                       clrObj;
+    System.Text.Encoding            utf8;
+    Map  MApError;
+    Object  val;
+    AccountNum CustAccount;
+    Email   varEmail;
+    DataAreaId empresa;
+    str rawResponse;
+    str value;
+
+    Map map;
+    Map map1, map2;
+    List testList;
+
+    ListEnumerator listEnumerator;
+    container test;
+    mapEnumerator mapEnumerator , mapEnumerator2;
+    boolean error = false,isfirstline = true;
+    System.Net.WebHeaderCollection httpHeader;
+    str  postData;
+    str               byteStr = "KXpxBZuLTRz2fa8442kK7GhraDHrFMbeKJjMgcf9M6HoqWBP5R6A7yZMpNxgJtvx";
+    CustTable custtable;
+
+    LogisticsPostalAddress  postalAddress;
+    DirPartyLocation partyLocation;
+    LogisticsLocationRole   locationRole;
+    DirPartyLocationRole    partyLocationRole;
+    //ALPTAMA2
+    LogisticsEntityPostalAddressView LogisticsEntityPostalAddressView;
+
+    LogisticsLocation LogisticsLocation;
+    LogisticsPostalAddress LogisticsPostalAddress;
+    LogisticsPostalAddressView LogisticsPostalAddressView,LogisticsPostalAddressViewStore;
+    LogisticsLocationRecId     primaryAddressLocation;
+    SILBabytutoResApiParameters SILBabytutoResApiParameters = SILBabytutoResApiParameters::find();
+    Sileinvoice Sileinvoice;
+    ecoResProductCategory ecoResProductCategory;
+    EcoResCategoryHierarchy hierarchy;
+    ItemId _ItemId,stock;
+    InventTable inventtable ;
+    int  QtyStock,i;
+    InventParameters inventparameters = InventParameters::find();
+    SILBabyTutoStock SILBabyTutoStock;
+    str StoreId,productId,type;
+    ;
+     byteStr = strfmt('%1:%2', "", "a5irdkcrqnkogtf50gcs0jv0f1");
+    utf8 = System.Text.Encoding::get_UTF8();
+    byteArray  = utf8.GetBytes(byteStr);
+    byteStr   = System.Convert::ToBase64String(byteArray);
+    
+   
+
+
+    new InteropPermission(InteropKind::ClrInterop).assert();
+
+
+    
+
+            type = "product";
+
+        if( isfirstline == true )
+        {
+
+         postData =  "[{\"storeId\": \""+StoreId+"\", \"productId\": \""+productId+"\",\"type\": \""+type+"\",\"stock\":"+int2str(QtyStock)+"}";
+             isfirstline = false;
+         }
+
+         else
+            {
+
+          postData +=   ",{\"storeId\": \""+StoreId+"\", \"productId\": \""+productId+"\",\"type\": \""+type+"\",\"stock\":"+int2str(QtyStock)+"}";
+
+                }
+
+
+
+
+
+
+            postData += "]";
+
+            httpHeader = new System.Net.WebHeaderCollection();
+            httpHeader.Add("Authorization", 'Bearer ' + byteStr);
+            url = 'https://api.api.com/method';
+
+            clrObj = System.Net.WebRequest::Create(url);
+            System.Net.ServicePointManager::set_Expect100Continue(false);
+
+            request = clrObj;
+            request.set_Headers(httpHeader);
+            request.set_Method("POST");
+
+            utf8 = System.Text.Encoding::get_UTF8();
+
+            byteArray = utf8.GetBytes(postData);
+            request.set_ContentType("application/json");
+            request.set_ContentLength(byteArray.get_Length());
+
+            dataStream = request.GetRequestStream();
+            dataStream.Write(byteArray, 0, byteArray.get_Length());
+            dataStream.Close();
+
+            try
+            {
+
+                response = request.GetResponse();
+                responseStream = response.GetResponseStream();
+                streamReader = new System.IO.StreamReader(responseStream);
+                APIresponse = streamReader.ReadToEnd();
+                info(APIresponse);
+                //info(postData);
+
+
+            }
+            catch (Exception::CLRError)
+            {
+
+                //bp deviation documented
+                ex = CLRInterop::getLastException();
+
+                ttsBegin;
+                CustTable.ErrorCRM = NoYes::Yes;
+                custtable.update();
+                ttsCommit;
+
+                error(ex.get_Message());
+            }
+        }
